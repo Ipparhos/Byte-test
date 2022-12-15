@@ -15,7 +15,6 @@ def main():
         data_categories = response_categories.json()
 
         #Checking that data is actually a dictionary
-        print(type(data_products),type(data_categories))
         return data_products, data_categories
 
 
@@ -23,12 +22,13 @@ def main():
         stats = []
         for categorie in data_categories:
             most_expensive_product = 0
+            stock_of_product = 0
             for product in data_products["products"]:
                 if product["category"] == categorie:
+                    stock_of_product += product['stock']
                     if most_expensive_product < product['price']:
                         most_expensive_product = product['price']
                         categorie_of_product = categorie
-                        stock_of_product = product['stock']
                         title_of_product = product['title']
             
             if most_expensive_product != 0:
@@ -40,7 +40,6 @@ def main():
         # Formating the stats into a more readable table            
         headers = ['CATEGORY', 'MOST EXPENSIVE PRODUCT', 'PRICE', 'CAT STOCK']
         table = columnar(stats, headers)
-        # print(table)
 
         with open('stats.txt', 'w') as f:
             f.write(table)
