@@ -1,52 +1,61 @@
-import requests
-import json
-from columnar import columnar
+def main():
+    import requests
+    import json
+    from columnar import columnar
 
-BASE_URL = 'https://dummyjson.com'
+    BASE_URL = 'https://dummyjson.com'
+    def request_to_dict (url):
+        response_products = requests.get(f"{url}/products")
 
-response_products = requests.get(f"{BASE_URL}/products")
-#print(response_products.json())
+        response_categories = requests.get(f"{url}/products/categories")
 
-response_categories = requests.get(f"{BASE_URL}/products/categories")
-#print(response_categories.json())
 
-#Making responses into a dictionary
-data_products = response_products.json()
-data_categories = response_categories.json()
+        #Making responses into a dictionary
+        data_products = response_products.json()
+        data_categories = response_categories.json()
 
-#Checking that data is actually a dictionary
-print(type(data_products),type(data_categories))
-# print(data_products)
+        #Checking that data is actually a dictionary
+        print(type(data_products),type(data_categories))
+        return data_products, data_categories
 
-# print(data_products["products"][1]["category"])
+    data_products, data_categories = request_to_dict(BASE_URL)
 
-#Finding the most expensive product
-stats = []
-for categorie in data_categories:
-    most_expensive_product = 0
-    for product in data_products["products"]:
-        if product["category"] == categorie:
-            if most_expensive_product < product['price']:
-                most_expensive_product = product['price']
-                categorie_of_product = categorie
-                stock_of_product = product['stock']
-                title_of_product = product['title']
-    
-    if most_expensive_product != 0:
-        stats.append([categorie_of_product, title_of_product, most_expensive_product, stock_of_product])
+    def finding_most_expensive_product(data_products, data_categories):
 
-# Formating the stats into a more readable table            
-headers = ['CATEGORY', 'MOST EXPENSIVE PRODUCT', 'PRICE', 'CAT STOCK']
-table = columnar(stats, headers)
-# print(table)
+        stats = []
+        for categorie in data_categories:
+            most_expensive_product = 0
+            for product in data_products["products"]:
+                if product["category"] == categorie:
+                    if most_expensive_product < product['price']:
+                        most_expensive_product = product['price']
+                        categorie_of_product = categorie
+                        stock_of_product = product['stock']
+                        title_of_product = product['title']
+            
+            if most_expensive_product != 0:
+                stats.append([categorie_of_product, title_of_product, most_expensive_product, stock_of_product])
+        return stats
+    stats = finding_most_expensive_product(data_products, data_categories)
 
-with open('stats.txt', 'w') as f:
-    f.write(table)
-f.close()
+    def write_table(stats):
+        # Formating the stats into a more readable table            
+        headers = ['CATEGORY', 'MOST EXPENSIVE PRODUCT', 'PRICE', 'CAT STOCK']
+        table = columnar(stats, headers)
+        # print(table)
 
-most_expensive_of_all = int(stats[0][2])
-for i in stats:
-    if int(i[2]) > most_expensive_of_all:
-        most_expensive_of_all = int(i[2])
-        item_description = i
-print(f"The price of the most expensive item is {item_description[2]}")
+        with open('stats.txt', 'w') as f:
+            f.write(table)
+        f.close()
+    write_table(stats)
+    def value_of_most_expensive_product(stats):
+        most_expensive_of_all = int(stats[0][2])
+        for i in stats:
+            if int(i[2]) > most_expensive_of_all:
+                most_expensive_of_all = int(i[2])
+                item_description = i
+        print(f"The price of the most expensive item is {item_description[2]}")
+    value_of_most_expensive_product(stats)
+
+if __name__ == "__main__":
+    main()
