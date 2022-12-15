@@ -18,10 +18,8 @@ def main():
         print(type(data_products),type(data_categories))
         return data_products, data_categories
 
-    data_products, data_categories = request_to_dict(BASE_URL)
 
     def finding_most_expensive_product(data_products, data_categories):
-
         stats = []
         for categorie in data_categories:
             most_expensive_product = 0
@@ -36,7 +34,7 @@ def main():
             if most_expensive_product != 0:
                 stats.append([categorie_of_product, title_of_product, most_expensive_product, stock_of_product])
         return stats
-    stats = finding_most_expensive_product(data_products, data_categories)
+    
 
     def write_table(stats):
         # Formating the stats into a more readable table            
@@ -47,7 +45,7 @@ def main():
         with open('stats.txt', 'w') as f:
             f.write(table)
         f.close()
-    write_table(stats)
+    
     def value_of_most_expensive_product(stats):
         most_expensive_of_all = int(stats[0][2])
         for i in stats:
@@ -55,6 +53,10 @@ def main():
                 most_expensive_of_all = int(i[2])
                 item_description = i
         print(f"The price of the most expensive item is {item_description[2]}")
+    
+    data_products, data_categories = request_to_dict(BASE_URL)
+    stats = finding_most_expensive_product(data_products, data_categories)
+    write_table(stats)
     value_of_most_expensive_product(stats)
 
 if __name__ == "__main__":
